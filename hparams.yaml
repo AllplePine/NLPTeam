@@ -1,0 +1,17 @@
+attention: scaled_dot_product
+attn_pdrop: 0.1
+betas: !!python/tuple
+- 0.9
+- 0.95
+block_size: 128
+final_tokens: 142754048
+hidden_layer_multiplier: 4
+learning_rate: 0.0006
+mlp_pdrop: 0.1
+n_embd: 512
+n_head: 4
+n_layer: 4
+resid_pdrop: 0.1
+vocab_size: 65
+warmup_tokens: 10240
+weight_decay: 0.1
