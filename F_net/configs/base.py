@@ -3,80 +3,99 @@
 import enum
 import ml_collections
 
+
 class ModelArchitecture(enum.Enum):
-    """
-    确定模型的架构，混合层
-    """
-    BERT = 'bert'
-    F_NET = 'f_net' #傅里叶变换网络
-    FF_ONLY = 'ff_only' #仅仅使用全连接层
-    LINEAR = 'linear' #具有可学习权重的的矩阵乘法
-    RANDOM = 'random' #随机初始化矩阵的权重
+  """Determines model architecture - in particular, the mixing layer."""
+  BERT = 'bert'
+  F_NET = 'f_net'  # Fourier Transform mixing
+  FF_ONLY = 'ff_only'  # Feed forward sublayers only; no token mixing
+  LINEAR = 'linear'  # Matrix multiplications with learnable weights
+  RANDOM = 'random'  # Constant, random matrix multiplications
+
 
 class TrainingMode(str, enum.Enum):
-    """
-    确定模型的训练模式 , 分为预训练和分类
-    """
-    PRETRAIN = 'pretraining'
-    CLASSIFICATION = 'classification'
+  """Determines type of training."""
+  PRETRAINING = 'pretraining'
+  CLASSIFICATION = 'classification'
 
-class HybridAttentionLayout(enum.Enum):
-    """
-    确定混合注意力层的布局，用注意力子层取代混合子层
-    """
-    BOTTOM = 'bottom'  # 第一个注意力子层
-    MIDDLE = 'middle'  # 中间的注意力子层
-    MIXED = 'mixed'  # 混合注意力子层
-    TOP = 'top'  # 最后一个注意力子层
+
+class HybridAttentionLayout(str, enum.Enum):
+  """Where, in hybrid models, attention sublayers replace mixing sublayers."""
+  BOTTOM = 'bottom'  # First mixing sublayers.
+  MIDDLE = 'middle'  # Middle mixing sublayers.
+  MIXED = 'mixed'  # Interspersed throughout model.
+  TOP = 'top'  # Final mixing sublayers.
+
 
 def get_config():
-    '''
-    预训练模型的基本的配置
-    '''
-    config = ml_collections.ConfigDict()
+  """Base config for training models."""
+  config = ml_collections.ConfigDict()
 
-    #确定要使用的模型
-    #特定的混合子层可以用注意力替换
-    config.model_arch: ModelArchitecture = ModelArchitecture.F_NET
+  # Determines which model to use.
+  # Specific mixing sublayers may be replaced with attention using
+  # config.attention_layout and config.num_attention_layers.
+  config.model_arch: ModelArchitecture = ModelArchitecture.F_NET
+  # How often to save the model checkpoint.
+  config.save_checkpoints_steps: int = 1000
+  # Frequency fo eval during training, e.g. every 1000 steps.
+  config.eval_frequency: int = 1000
 
-    config.save_checkpoints_steps: int = 1000  #保存检查点
+  # Total batch size for training.
+  config.train_batch_size: int = 32
+  # Total batch size for eval.
+  config.eval_batch_size: int = 8
 
-    config.eval_frequency: int = 1000  #评估的频率
+  # The base learning rate for Adam.
+  config.learning_rate: float = 1e-4
 
-    config.learning_rate: float = 1e-4  #学习率
+  # Initial checkpoint directory or filepath (usually from a pre-trained model).
+  config.init_checkpoint_dir: str = ''
 
-    config.init_checkpoint_dir: str = ''  #初始化检查点的路径
+  # Whether to lower case the input text. Should be True for uncased models and
+  # False for cased models.
+  config.do_lower_case: bool = True
 
-    config.do_lower_case: bool = True  #是否将输入转换为小写
+  # Model parameters.
 
-    config.type_vocab_size: int = 4  #类型词汇表的大小
+  # For pre-training, we only need 2 segment types (for NSP), but we allow up to
+  # 4 for GLUE/SuperGLUE fine-tuning.
+  config.type_vocab_size: int = 4
+  # Embedding dimension for each token.
+  config.d_emb: int = 768
+  # Hidden dimension of model.
+  config.d_model: int = 768
+  # Hidden dimension for feed-forward layer.
+  config.d_ff: int = 3072
+  # The maximum total input sequence length after tokenization. Sequences longer
+  # than this will be truncated, and sequences shorter than this will be padded.
+  config.max_seq_length: int = 512
+  # Number of self-attention heads. Only used for BERT models.
+  config.num_heads: int = 12
+  # Number of model blocks / layers.
+  config.num_layers: int = 12
+  # Regular dropout rate, applied throughout model.
+  config.dropout_rate: float = 0.1
+  # Dropout rate used in mixing module, e.g. self-attention sublayer.
+  config.mixing_dropout_rate: float = 0.1
 
-    config.d_emb: int = 768  #嵌入层的维度
+  # Determines whether or not the FFT is used in lieu of matrix multiplications.
+  # Only relevant for FNet: If true, favor FFT over matrix multiplications to
+  # compute the DFT.
+  config.use_fft: bool = True
 
-    config.d_model: int = 768  #模型的维度
+  # For hybrid models, attention layers replace a subset of the mixing
+  # sublayers.
+  config.attention_layout: HybridAttentionLayout = HybridAttentionLayout.TOP
+  config.num_attention_layers: int = 0
 
-    config.d_ff: int = 3072  #前馈网络的维度
+  # Random number generator seed.
+  config.seed: int = 0
 
-    config.max_seq_length: int = 512  #最大序列长度
+  # Dummy parameter for repeated runs.
+  config.trial: int = 0
+  # Add omnistaging_enabled attribute to the config object
+  config.omnistaging_enabled = False
 
-    config.num_heads: int = 12  #头的数量
+  return config
 
-    config.num_layers: int = 12  #层数
-
-    config.dropout_rate: float = 0.1  #丢失率
-
-    config.mixing_dropout_rate: float = 0.1  #混合丢失率
-
-
-    config.use_fft: bool = True  #是否使用傅里叶变换
-
-    config.attention_layout: HybridAttentionLayout = HybridAttentionLayout.MIXED  #混合注意力层的布局
-
-    config.num_attention_layers: int = 0  #注意力层的数量
-
-    config.seed: int = 0  #种子
-
-    config.trail:int = 0  #训练的轮数
-
-    return config
 

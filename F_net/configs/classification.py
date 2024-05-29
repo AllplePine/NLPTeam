@@ -1,38 +1,53 @@
-'''用于在 GLUE 和 SuperGLUE 基准上进行微调的配置。'''
+"""Config for fine-tuning on the GLUE and SuperGLUE benchmarks."""
 
-from configs import base as base_config
+from f_net.configs import base as base_config
+from f_net.configs.base import ModelArchitecture
+from f_net.configs.base import TrainingMode
 
-from configs.base import ModelArchitecture, HybridAttentionLayout
 
 def get_config():
-    '''预训练的模型配置'''
+  """Config for fine-tuning (classification)."""
+  config = base_config.get_config()
 
-    config = base_config.get_config()
+  # Determines which model to use.
+  config.model_arch: ModelArchitecture = ModelArchitecture.F_NET
 
-    config.model_arch: ModelArchitecture = ModelArchitecture.F_NET
+  config.mode: TrainingMode = TrainingMode.CLASSIFICATION
 
-    config.mode: TrainingMode = TrainingMode.CLASSIFICATION
+  # This is either "glue/DS_g", where DS_g is one of the following:
+  # [cola, sst2, mrpc, qqp, stsb, mnli, qnli, rte, wnli].
+  config.dataset_name: str = "glue/rte"
 
-    config.dataset_name: str = 'glue/rte' #数据集的名称
+  # How often to save the model checkpoint.
+  config.save_checkpoints_steps: int = 200
+  # Training metrics will be computed (1 / eval_proportion) times during
+  # training at regularly spaced intervals, regardless of dataset size.
+  config.eval_proportion: float = 0.05
 
-    config.save_checkpoints_steps: int = 200 #保存检查点的步数
+  # Total batch size for training.
+  config.train_batch_size: int = 64
+  # Total batch size for eval (and predictions).
+  config.eval_batch_size: int = 32
 
-    config.eval_proportion: float = 0.05 #评估的比例
+  # The base learning rate for Adam.
+  config.learning_rate: float = 1e-5
 
-    config.train_batch_size: int = 64 #训练的批次大小
+  # Total number of training epochs to perform.
+  config.num_train_epochs: float = 3
+  # Proportion of training to perform linear learning rate warmup for.
+  # E.g., 0.1 = 10% of training steps.
+  config.warmup_proportion: float = 0.1
 
-    config.eval_batch_size: int = 32 #评估的批次大小
+  # Maximum number of eval steps on validation split. Actual number of step may
+  # be less for small eval datasets.
+  config.max_num_eval_steps: int = int(1e5)
 
-    config.learning_rate: float = 1e-5 #学习率
+  # Initial checkpoint directory or filepath (usually from a pre-trained model).
+  config.init_checkpoint_dir: str = ""
 
-    config.num_train_epochs: int = 3 #训练的轮数
+  # Dummy attribute for repeated runs.
+  config.trial: int = 0
 
-    config.warmup_proportion: float = 0.1 #热身的比例
+  return config
 
-    config.max_num_eval_steps: int = 10000 #最大评估的步数
 
-    config.init_checkpoint_dir: str = '' #初始化检查点的路径
-
-    config.trail: int = 0 #重复训练的虚拟参数
-    
-    return config
