@@ -34,9 +34,9 @@ import numpy as np
 from scipy import stats as scipy_stats
 import tensorflow_datasets as tfds
 
-from f_net import input_pipeline
-from f_net import models
-from f_net import train_utils
+import input_pipeline
+import models
+import train_utils
 import sentencepiece as spm
 
 # Type Stubs
