@@ -27,10 +27,10 @@ import jax.numpy as jnp
 import ml_collections
 from scipy import linalg
 
-from f_net import fourier
-from f_net import layers
-from f_net.configs.base import HybridAttentionLayout
-from f_net.configs.base import ModelArchitecture
+import fourier
+import layers
+from configs.base import HybridAttentionLayout
+from configs.base import ModelArchitecture
 
 # Type Stubs
 MixingLayer = Any

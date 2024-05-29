@@ -23,7 +23,7 @@ from absl.testing import parameterized
 import numpy as np
 import tensorflow_datasets as tfds
 
-from f_net import input_pipeline
+import input_pipeline
 import sentencepiece as spm
 
 

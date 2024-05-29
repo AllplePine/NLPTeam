@@ -23,9 +23,9 @@ import jax
 from ml_collections import config_flags
 import tensorflow as tf
 
-from f_net import run_classifier
-from f_net import run_pretraining
-from f_net.configs.base import TrainingMode
+import run_classifier
+import run_pretraining
+from configs.base import TrainingMode
 
 config_flags.DEFINE_config_file(
     "config", None, "Training configuration.", lock_config=True)

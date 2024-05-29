@@ -23,7 +23,7 @@ from jax import numpy as jnp
 import ml_collections
 import numpy as np
 
-from f_net import layers
+import layers
 
 # Type Stubs
 PRNGKey = Any

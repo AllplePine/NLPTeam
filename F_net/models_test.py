@@ -23,10 +23,10 @@ import jax
 from jax import numpy as jnp
 import ml_collections
 
-from f_net import models
-from f_net.configs import base as base_config
-from f_net.configs.base import HybridAttentionLayout
-from f_net.configs.base import ModelArchitecture
+import models
+from configs import base as base_config
+from configs.base import HybridAttentionLayout
+from configs.base import ModelArchitecture
 
 # Type Stubs
 PRNGKey = Any
